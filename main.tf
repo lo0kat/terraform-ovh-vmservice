@@ -21,6 +21,7 @@ data "openstack_images_image_v2" "debian" {
   name        = "Debian 11"   # Image name
   most_recent = true          # Limits search to the most recent
   provider    = openstack.ovh # Provider name
+  region      =  var.region
 }
 
 
