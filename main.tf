@@ -1,12 +1,13 @@
+provider "openstack" {
+  auth_url    = "https://auth.cloud.ovh.net/v3" # Authentication URL
+  domain_name = "default"                       # Domain name - Always at 'default' for OVHcloud
+  alias       = "ovh"                           # An alias
+}
 provider "ovh" {
+  alias    = "ovh"
   endpoint = "ovh-eu"
 }
 
-provider "openstack" {
-  auth_url    = "https://auth.cloud.ovh.net/v3/" # Authentication URL
-  domain_name = "default"                        # Domain name - Always at 'default' for OVHcloud
-  alias       = "ovh"                            # An alias
-}
 
 
 # Creating an SSH key pair
@@ -25,12 +26,11 @@ data "openstack_images_image_v2" "debian" {
 }
 
 
-
 # Creating the instance
 resource "openstack_compute_instance_v2" "terraform_instance" {
   name        = var.vm_name   # Instance name
   provider    = openstack.ovh # Provider name
-  image_id    = openstack_images_image_v2.debian.id
+  image_id    = data.openstack_images_image_v2.debian.id
   flavor_name = var.vm_flavor # Instance type name
   region      = var.region
   # Name of openstack_compute_keypair_v2 resource named keypair_test
