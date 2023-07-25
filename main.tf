@@ -11,9 +11,12 @@ provider "ovh" {
 
 
 # Creating an SSH key pair
-resource "ovh_me_ssh_key" "account_keypair" {
-  key_name = "ovh_vm_keypair"
-  key      = var.public_key
+
+resource "openstack_compute_keypair_v2" "account_keypair" {
+  provider   = openstack.ovh    # Specify provider name
+  name       = "ovh_vm_keypair" # Name of the SSH key
+  public_key = var.public_key   # Your SSH key path
+  region     = var.region
 }
 
 
@@ -21,7 +24,7 @@ data "openstack_images_image_v2" "debian" {
   name        = "Debian 11"   # Image name
   most_recent = true          # Limits search to the most recent
   provider    = openstack.ovh # Provider name
-  region      =  var.region
+  region      = var.region
 }
 
 
@@ -33,7 +36,7 @@ resource "openstack_compute_instance_v2" "terraform_instance" {
   flavor_name = var.vm_flavor # Instance type name
   region      = var.region
   # Name of openstack_compute_keypair_v2 resource named keypair_test
-  key_pair        = ovh_me_ssh_key.account_keypair.key_name
+  key_pair        = openstack_compute_keypair_v2.account_keypair.name
   security_groups = [openstack_networking_secgroup_v2.vm_service_sg1.name]
   network {
     name = "Ext-Net" # Adds the network component to reach your instance
